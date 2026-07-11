@@ -1,0 +1,173 @@
+# Printavo API v2 - Example Operations
+#
+# Grounded example queries and mutations against the Printavo GraphQL endpoint
+# https://www.printavo.com/api/v2  (headers: email, token, Content-Type: application/json)
+#
+# Field selections follow the published object reference at
+# https://www.printavo.com/docs/api/v2
+
+# ── Quotes ────────────────────────────────────────────────
+
+query ListQuotes {
+  quotes(first: 25) {
+    edges {
+      node {
+        id
+        visualId
+        nickname
+        total
+        amountOutstanding
+        paidInFull
+        customerDueAt
+        status { id name color type }
+        contact { fullName email }
+      }
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+
+mutation CreateQuote {
+  quoteCreate(input: {
+    customerId: "Q3VzdG9tZXItMTIz"
+    nickname: "Spring team tees"
+    productionNote: "Rush - due Friday"
+    tags: ["rush", "screenprint"]
+  }) {
+    id
+    visualId
+    status { name }
+  }
+}
+
+mutation DuplicateQuote {
+  quoteDuplicate(id: "UXVvdGUtNDU2") {
+    id
+    visualId
+  }
+}
+
+# ── Orders (Quote + Invoice union) ────────────────────────
+
+query OpenOrdersByStatus {
+  orders(first: 25, statusIds: ["U3RhdHVzLTk4"], sortOn: "dueAt") {
+    edges {
+      node {
+        ... on Quote   { id visualId total dueAt status { name } }
+        ... on Invoice { id visualId total dueAt paidInFull status { name } }
+      }
+    }
+  }
+}
+
+# ── Customers & Contacts ──────────────────────────────────
+
+query CustomerWithOrders {
+  customer(id: "Q3VzdG9tZXItMTIz") {
+    id
+    companyName
+    orderCount
+    primaryContact { fullName email phone }
+    orders(first: 5) {
+      edges { node { ... on Invoice { visualId total paidInFull } } }
+    }
+  }
+}
+
+mutation CreateContact {
+  contactCreate(input: {
+    customerId: "Q3VzdG9tZXItMTIz"
+    firstName: "Dana"
+    lastName: "Lopez"
+    email: "dana@example.com"
+    phone: "555-0134"
+  }) {
+    id
+    fullName
+  }
+}
+
+# ── Line Items ────────────────────────────────────────────
+
+mutation AddLineItem {
+  lineItemCreate(input: {
+    lineItemGroupId: "TElHLTc4OQ=="
+    product: "Gildan 5000"
+    color: "Black"
+    description: "Front + back print"
+    price: 12.50
+    sizes: [
+      { size: "S", quantity: 12 }
+      { size: "M", quantity: 24 }
+      { size: "L", quantity: 18 }
+    ]
+  }) {
+    id
+    itemNumber
+    price
+  }
+}
+
+# ── Statuses ──────────────────────────────────────────────
+
+query ListInvoiceStatuses {
+  statuses(first: 50, type: INVOICE) {
+    edges { node { id name color position } }
+  }
+}
+
+mutation MoveOrderStatus {
+  statusUpdate(input: { parentId: "SW52b2ljZS02NjY=", statusId: "U3RhdHVzLTk5" }) {
+    id
+    name
+  }
+}
+
+# ── Tasks ─────────────────────────────────────────────────
+
+query OpenTasks {
+  tasks(first: 25, sortOn: "dueAt") {
+    edges {
+      node {
+        id
+        name
+        dueAt
+        completed
+        assignedTo { firstName lastName }
+      }
+    }
+  }
+}
+
+mutation CreateTask {
+  taskCreate(input: {
+    name: "Burn screens"
+    dueAt: "2026-07-15T09:00:00Z"
+    taskableId: "SW52b2ljZS02NjY="
+  }) {
+    id
+    name
+    dueAt
+  }
+}
+
+# ── Payments ──────────────────────────────────────────────
+
+mutation RecordPayment {
+  transactionPaymentCreate(input: {
+    orderId: "SW52b2ljZS02NjY="
+    amount: 250.00
+    category: "Card"
+  }) {
+    id
+    amount
+  }
+}
+
+# ── Merch ─────────────────────────────────────────────────
+
+query MerchStores {
+  merchStores(first: 25) {
+    edges { node { id name url online opensAt closesAt } }
+  }
+}

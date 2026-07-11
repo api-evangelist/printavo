@@ -1,0 +1,96 @@
+specification: FinOps Framework
+specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
+provider: Printavo
+providerId: printavo
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: false
+tags:
+- Print Shop Management
+- Screen Printing
+- GraphQL
+- FinOps
+- Cost Management
+- FOCUS
+description: >-
+  FinOps view of Printavo spend. Printavo is a fixed monthly SaaS subscription,
+  not a usage-metered API. The dominant cost is the plan tier (Lite $109,
+  Standard $244, Premium quote-based) plus optional add-ons (extra users at
+  $19/month, additional automations, and the Printavo Merch store add-on at
+  $109/month). API v2 (GraphQL) access is a FEATURE of the Premium tier and is
+  not billed per call - there is no per-request charge, only a 10-requests-per-5-seconds
+  rate limit. Therefore the API cost is effectively the delta to reach Premium
+  rather than metered consumption.
+notes: >-
+  There is no consumption-based API meter to model in FOCUS terms; API access is
+  bundled into the Premium subscription. The meters below track subscription and
+  seat costs, which are the real cost drivers. Verify current prices on the
+  Printavo pricing page during reconciliation.
+sources:
+- https://www.printavo.com/pricing/
+- https://www.printavo.com/docs/api/v2
+- https://www.printavo.com/blog/new-graphql-api/
+- https://focus.finops.org/focus-specification/v1-3/
+alignedWith:
+  framework: FinOps Foundation Framework
+  frameworkUrl: https://www.finops.org/framework/
+  dataSpec: FOCUS
+  dataSpecVersion: '1.3'
+  dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
+publisherName: Printavo
+serviceCategory: Business Application Software
+billingModel:
+  pricingCategory: Subscription
+  billingFrequency: Monthly
+  billingCurrency: USD
+  chargeCategories:
+  - Purchase
+  - Usage
+focusColumns:
+  ServiceName: Printavo
+  ServiceCategory: Business Application Software
+  ProviderName: Printavo
+  PublisherName: Printavo
+  InvoiceIssuerName: Printavo
+  BillingCurrency: USD
+  ChargeCategory: Purchase
+  PricingCategory: Subscription
+meters:
+- name: plan_subscription
+  description: Monthly Printavo plan subscription (Lite, Standard, or Premium). Premium is the only tier with API access.
+  unit: months
+  aggregation: sum
+  dimensions:
+  - account
+  - plan
+- name: additional_users
+  description: Seats beyond the plan's included users, billed at $19/month each on Premium.
+  unit: users
+  aggregation: sum
+  dimensions:
+  - account
+- name: automations
+  description: Automation packs beyond the included allotment (additional 30 automations for $15/month).
+  unit: packs
+  aggregation: sum
+  dimensions:
+  - account
+- name: merch_addon
+  description: Printavo Merch online-store add-on at $109/month.
+  unit: months
+  aggregation: sum
+  dimensions:
+  - account
+principles:
+- name: Visibility
+  description: Track the monthly plan tier, seat count, automation packs, and Merch add-on; API calls themselves carry no separate charge.
+- name: Allocation
+  description: Attribute the Premium subscription premium to the teams/integrations that actually require API access.
+- name: Optimization
+  description: Only step up to Premium when API access, Power Scheduler, or PO workflows are genuinely needed; right-size seats and automation packs; stay within the 10-requests-per-5-seconds limit to avoid retries rather than for cost.
+- name: Accountability
+  description: Assign an owner for the Printavo subscription and review seat/add-on growth against actual usage each billing cycle.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

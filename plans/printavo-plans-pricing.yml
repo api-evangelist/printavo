@@ -1,0 +1,205 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Printavo
+providerId: printavo
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: false
+tags:
+- Print Shop Management
+- Screen Printing
+- Quotes
+- Invoices
+- GraphQL
+- Plans
+description: >-
+  Printavo is sold as a monthly SaaS subscription in three published tiers - Lite,
+  Standard, and Premium - plus a Merch online-store add-on. API v2 (GraphQL)
+  access is included ONLY on the Premium tier; Lite and Standard do not include
+  API access. Prices below are the published monthly rates captured from the
+  Printavo pricing page and may change; the Premium tier is quote-based
+  (Contact Us).
+notes: >-
+  Access to the Printavo GraphQL API requires a Premium-tier account, where an
+  API token is generated on the My Account page. There is no separate metered
+  charge for API calls beyond the 10-requests-per-5-seconds rate limit; the API
+  is a feature of the Premium subscription. Verify current prices, seat counts,
+  and automation limits on the pricing page during reconciliation.
+sources:
+- https://www.printavo.com/pricing/
+- https://www.printavo.com/docs/api/v2
+- https://www.printavo.com/blog/new-graphql-api/
+plans:
+- id: printavo-lite
+  name: Lite
+  type: paid
+  description: >-
+    Entry tier for small shops - includes the mobile app, order tracking, and
+    task management. Does NOT include API access.
+  entries:
+  - label: Monthly Subscription
+    name: lite_monthly
+    type: flat
+    metric: subscription
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: '$109/month'
+    userMultiplied: false
+  - label: Included Users
+    name: lite_users
+    type: quota
+    metric: users
+    limit: 2
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: included
+    userMultiplied: false
+  - label: Quotes and Invoices
+    name: lite_documents
+    type: quota
+    metric: documents
+    limit: 20
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: included
+    userMultiplied: false
+  elements:
+  - name: Mobile App
+  - name: Order Tracking
+  - name: Task Management
+  - name: Basic Customer Messaging
+  - name: No API Access
+- id: printavo-standard
+  name: Standard
+  type: paid
+  description: >-
+    Mid tier with unlimited quotes/invoices, sales pipeline, pricing matrices,
+    product catalogs, and quote/artwork approvals. Does NOT include API access.
+  entries:
+  - label: Monthly Subscription
+    name: standard_monthly
+    type: flat
+    metric: subscription
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: '$244/month'
+    userMultiplied: false
+  - label: Included Users
+    name: standard_users
+    type: quota
+    metric: users
+    limit: 5
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: included
+    userMultiplied: false
+  - label: Quotes and Invoices
+    name: standard_documents
+    type: quota
+    metric: documents
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: unlimited
+    userMultiplied: false
+  elements:
+  - name: Everything in Lite
+  - name: Sales Pipeline
+  - name: Pricing Matrices
+  - name: Product Catalogs
+  - name: Quote and Artwork Approvals
+  - name: No API Access
+- id: printavo-premium
+  name: Premium
+  type: paid
+  description: >-
+    Top tier and the ONLY plan that includes API access (GraphQL API v2) for
+    custom integrations, plus a dedicated success manager, Power Scheduler, and
+    purchase-order/receiving workflows. Priced by quote (Contact Us).
+  entries:
+  - label: Monthly Subscription
+    name: premium_monthly
+    type: flat
+    metric: subscription
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: contact sales (quote-based)
+    userMultiplied: false
+  - label: Included Users
+    name: premium_users
+    type: quota
+    metric: users
+    limit: 20
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: 'included; additional users $19/month'
+    userMultiplied: false
+  - label: API Requests
+    name: premium_api_requests
+    type: quota
+    metric: requests
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: 'included with Premium; rate-limited to 10 requests / 5 seconds'
+    userMultiplied: false
+  elements:
+  - name: Everything in Standard
+  - name: API Access (GraphQL API v2)
+  - name: Dedicated Success Manager
+  - name: Power Scheduler
+  - name: Purchase Orders and Receiving
+- id: printavo-merch-addon
+  name: Printavo Merch (Add-On)
+  type: paid
+  description: >-
+    Optional add-on that adds online group-store (Merch) functionality, surfaced
+    in the API via merchStore and merchOrder.
+  entries:
+  - label: Monthly Add-On
+    name: merch_monthly
+    type: flat
+    metric: subscription
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: '$109/month'
+    userMultiplied: false
+  elements:
+  - name: Online Merch Stores
+  - name: Group Ordering
+- id: printavo-trial
+  name: Free Trial
+  type: free
+  description: >-
+    Free 7-day trial with no credit card required.
+  entries:
+  - label: Trial Period
+    name: trial
+    type: quota
+    metric: days
+    limit: 7
+    timeFrame: once
+    geo: global
+    unit: 1
+    price: free
+    userMultiplied: false
+  elements:
+  - name: Evaluation Access
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

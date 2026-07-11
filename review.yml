@@ -1,0 +1,124 @@
+aid: printavo
+name: Printavo
+review:
+  question: Does Printavo expose a documented public WebSocket API?
+  answer: false
+  date: '2026-07-11'
+  reviewer: API Evangelist
+  asyncapiSpecCreated: false
+  asyncapiScopeNote: |
+    No AsyncAPI document was authored. Printavo's public API (API v2) is a
+    request/response GraphQL API served over HTTPS at a single POST endpoint,
+    https://www.printavo.com/api/v2. There is no documented server-push
+    transport - no WebSocket, no GraphQL subscriptions, and no Server-Sent
+    Events - on Printavo's own API to model. The GraphQL schema exposes only
+    Query and Mutation roots; no Subscription root is documented.
+findings:
+  summary: |
+    Printavo does not publish a documented public WebSocket API. Printavo API v2
+    is a native GraphQL API (replacing the legacy REST API) for print shop
+    management - quotes, invoices, orders, customers, contacts, line items,
+    imprints, statuses, tasks, payments, and Printavo Merch stores. All
+    operations are request/response GraphQL over HTTPS to a single POST endpoint
+    at https://www.printavo.com/api/v2. Authentication uses two custom request
+    headers, `email` and `token` (the token is generated on the My Account page),
+    plus Content-Type: application/json. The API is gated to Printavo's Premium
+    subscription tier. Documented limits are 10 requests per 5 seconds per email
+    or IP, a query-complexity limit of 25000, and a maximum query depth of 13.
+    No realtime, bidirectional, subscription, or streaming WebSocket (ws:// or
+    wss://) endpoint is documented anywhere in Printavo's API reference.
+  accessModel: |
+    Public developer documentation and the GraphQL schema are openly readable at
+    https://www.printavo.com/docs/api/v2, but live API tokens are only issued on
+    the Premium plan (Lite and Standard do not include API access). Because
+    exercising the API requires a paid Premium token, the endpoints in this
+    catalog are honestly MODELED from the published query/mutation/object
+    reference rather than confirmed against a live token. The operation and
+    object names, auth scheme, and limits are grounded in the public docs; input
+    field shapes on some mutations are modeled.
+  transports:
+    - protocol: GraphQL over HTTP
+      scheme: https
+      baseURL: https://www.printavo.com/api/v2
+      documented: true
+      note: Single POST GraphQL endpoint. Query and Mutation roots only; request/response.
+    - protocol: WebSocket
+      scheme: wss
+      documented: false
+      note: No WebSocket endpoint is documented in Printavo's API v2 reference as of the review date.
+    - protocol: GraphQL Subscriptions
+      scheme: wss
+      documented: false
+      note: The published schema documents no Subscription root; there is no realtime GraphQL surface.
+    - protocol: SSE
+      scheme: https
+      documented: false
+      note: No Server-Sent Events streaming is documented on the Printavo API.
+  endpointsModeled: true
+  endpointsModeledNote: |
+    Printavo API v2 is a single GraphQL endpoint, so there is one HTTP route
+    (POST https://www.printavo.com/api/v2) carrying many GraphQL operations. The
+    operations below are grounded in the public operation/query and
+    operation/mutation reference pages; object fields are grounded from the
+    published object pages (quote, task, customer, lineitem, status). Mutation
+    input shapes are modeled.
+  operationsConfirmedGraphQL:
+    queries:
+      - account
+      - user
+      - customer / customers
+      - contact / contacts
+      - order / orders
+      - quote / quotes
+      - invoice / invoices
+      - lineItem / lineItemGroup
+      - lineItemGroupPricing
+      - status / statuses
+      - task / tasks
+      - inquiry / inquiries
+      - thread / threads
+      - paymentRequests
+      - transaction / transactions / transactionDetail
+      - products
+      - merchOrder
+      - merchStore / merchStores
+    mutations:
+      - quoteCreate / quoteUpdate / quoteDelete / quoteDuplicate
+      - invoiceUpdate / invoiceDelete / invoiceDuplicate
+      - customerCreate / customerUpdate / customerDelete
+      - contactCreate / contactUpdate / contactDelete
+      - lineItemCreate / lineItemCreates / lineItemUpdate / lineItemUpdates / lineItemDelete / lineItemDeletes
+      - lineItemGroupCreate / lineItemGroupCreates / lineItemGroupUpdate / lineItemGroupUpdates / lineItemGroupDelete / lineItemGroupDeletes
+      - imprintCreate / imprintCreates / imprintUpdate / imprintUpdates / imprintDelete / imprintDeletes
+      - feeCreate / feeCreates / feeUpdate / feeUpdates / feeDelete / feeDeletes
+      - taskCreate / taskUpdate / taskDelete
+      - statusUpdate
+      - approvalRequestCreate / approvalRequestApprove / approvalRequestUnapprove / approvalRequestRevoke
+      - transactionPaymentCreate / transactionPaymentUpdate / transactionPaymentDelete
+      - login / logout
+sources:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+    note: API v2 overview - GraphQL endpoint www.printavo.com/api/v2, email+token headers, rate/complexity/depth limits. No WebSocket.
+  - url: https://www.printavo.com/docs/api/v2/operation/query/
+    type: APIReference
+    note: Query root operations (orders, quotes, invoices, customers, contacts, line items, statuses, tasks, payments, merch).
+  - url: https://www.printavo.com/docs/api/v2/operation/mutation
+    type: APIReference
+    note: Mutation root operations (create/update/delete/duplicate across quotes, invoices, customers, line items, tasks, statuses, payments).
+  - url: https://www.printavo.com/blog/new-graphql-api/
+    type: Blog
+    note: Announces API v2 as GraphQL replacing the legacy REST API; confirms API access requires a Premium-tier account.
+  - url: https://www.printavo.com/pricing/
+    type: Plans
+    note: Lite $109, Standard $244, Premium (contact us); only Premium includes API access.
+actions:
+  asyncapiPath: null
+  apisYmlUpdated: true
+  reason: |
+    No WebSocket, GraphQL subscription, or SSE protocol surface exists on
+    Printavo's own API. Printavo API v2 is request/response GraphQL over HTTPS
+    with only Query and Mutation roots, so no AsyncAPI document was created. A
+    grounded GraphQL schema and example-operation files were authored under
+    graphql/ instead, and the provider entry was built with endpointsModeled
+    flagged because the API is Premium-gated and could not be exercised live.

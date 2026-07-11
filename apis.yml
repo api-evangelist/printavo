@@ -1,0 +1,258 @@
+aid: printavo
+url: https://raw.githubusercontent.com/api-evangelist/printavo/refs/heads/main/apis.yml
+name: Printavo
+kind: company
+description: >-
+  Printavo is print shop management software for screen printers, embroiderers,
+  and other decorated-apparel businesses, covering quotes, invoices, orders,
+  customers, line items, production statuses, tasks, payments, and merch stores.
+  Printavo exposes a public GraphQL API (API v2) at www.printavo.com/api/v2 that
+  supersedes its legacy REST API. The GraphQL API is authenticated with an
+  account email plus an API token and is gated to Printavo's Premium
+  subscription tier; the API reference and GraphQL schema are publicly
+  documented at www.printavo.com/docs/api/v2.
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+tags:
+- Print Shop Management
+- Screen Printing
+- Embroidery
+- Quotes
+- Invoices
+- Orders
+- GraphQL
+- Decorated Apparel
+created: '2026-07-11'
+modified: '2026-07-11'
+specificationVersion: '0.19'
+apis:
+- aid: printavo:printavo-quotes-api
+  name: Printavo Quotes API
+  tags:
+  - Quotes
+  - Estimates
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/object/quote/
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for quotes - the pre-invoice document in Printavo. Query a
+    single quote or a paginated quotes connection, and create, update, delete,
+    or duplicate quotes via the quoteCreate, quoteUpdate, quoteDelete, and
+    quoteDuplicate mutations. Covers financials, production and payment due
+    dates, status, contact, and line item groups.
+- aid: printavo:printavo-invoices-api
+  name: Printavo Invoices API
+  tags:
+  - Invoices
+  - Orders
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/operation/mutation
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for invoices - a quote that has been converted into a
+    billable order. Query a single invoice or an invoices connection, and update,
+    delete, or duplicate invoices via the invoiceUpdate, invoiceDelete, and
+    invoiceDuplicate mutations.
+- aid: printavo:printavo-orders-api
+  name: Printavo Orders API
+  tags:
+  - Orders
+  - Production
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/operation/query/
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for orders, where an order is the union of quotes and
+    invoices. Query a single order or a paginated orders connection with
+    filtering by production dates and statuses and sorting options. Orders are
+    modified through their underlying quote, invoice, and line item mutations.
+- aid: printavo:printavo-customers-api
+  name: Printavo Customers and Contacts API
+  tags:
+  - Customers
+  - Contacts
+  - CRM
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/object/customer/
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for customers (companies) and their contacts. Query single
+    or plural customers and contacts, and create, update, or delete them via the
+    customerCreate, customerUpdate, customerDelete, contactCreate,
+    contactUpdate, and contactDelete mutations. Customers expose contacts,
+    orders, and reminders connections.
+- aid: printavo:printavo-line-items-api
+  name: Printavo Line Items API
+  tags:
+  - Line Items
+  - Imprints
+  - Fees
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/object/lineitem/
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for the products, garments, and decoration that make up an
+    order. Query line items and line item groups, and create, update, or delete
+    line items, line item groups, imprints, and fees - including batch variants
+    such as lineItemCreates and lineItemUpdates.
+- aid: printavo:printavo-statuses-api
+  name: Printavo Statuses API
+  tags:
+  - Statuses
+  - Workflow
+  - Production
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/object/status/
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for the production statuses that track an order through the
+    shop. Query a single status or a statuses connection, and move an order
+    between stages with the statusUpdate mutation. Each status carries a name,
+    color, type, and position.
+- aid: printavo:printavo-tasks-api
+  name: Printavo Tasks API
+  tags:
+  - Tasks
+  - Approvals
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/object/task/
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for tasks and approval requests attached to quotes,
+    invoices, and orders. Query single or plural tasks with sorting, and create,
+    update, or delete tasks via taskCreate, taskUpdate, and taskDelete, plus
+    manage artwork and quote approvals via the approvalRequest mutations.
+- aid: printavo:printavo-payments-api
+  name: Printavo Payments API
+  tags:
+  - Payments
+  - Transactions
+  - Fees
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/operation/query/
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for payments and money movement. Query transactions,
+    transaction details, and payment requests, and record, update, or delete
+    payments via transactionPaymentCreate, transactionPaymentUpdate, and
+    transactionPaymentDelete.
+- aid: printavo:printavo-merch-api
+  name: Printavo Merch API
+  tags:
+  - Merch
+  - Online Stores
+  - Ecommerce
+  - GraphQL
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://www.printavo.com/docs/api/v2
+  baseURL: https://www.printavo.com/api/v2
+  properties:
+  - url: https://www.printavo.com/docs/api/v2
+    type: Documentation
+  - url: https://www.printavo.com/docs/api/v2/object/merchstore
+    type: APIReference
+  - url: graphql/printavo-schema.graphql
+    type: GraphQL
+  - url: graphql/printavo-graphql.md
+    type: GraphQL
+  description: >-
+    GraphQL surface for Printavo Merch online stores. Query merch orders and
+    merch stores (a separately priced add-on) to pull group-store sales into the
+    same order and production workflow as the rest of the shop.
+common:
+- type: LinkedIn
+  url: https://www.linkedin.com/company/printavo
+- type: Website
+  url: https://www.printavo.com/
+- type: Documentation
+  url: https://www.printavo.com/docs/api/v2
+- type: Plans
+  url: plans/printavo-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/printavo-rate-limits.yml
+- type: FinOps
+  url: finops/printavo-finops.yml
+- type: Blog
+  url: https://www.printavo.com/blog/
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

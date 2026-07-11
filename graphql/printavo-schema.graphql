@@ -1,0 +1,790 @@
+"""
+Printavo API v2 GraphQL Schema (partial, grounded)
+
+Printavo API v2 is a NATIVE GraphQL API. This schema is a grounded subset of the
+public schema documented at https://www.printavo.com/docs/api/v2, focused on the
+core objects covered by this catalog: Orders (Quotes + Invoices), Customers and
+Contacts, Line Items, Statuses, Tasks, Payments, and Merch.
+
+Endpoint:  https://www.printavo.com/api/v2   (single POST GraphQL endpoint)
+Auth:      request headers `email` and `token` (API token from the My Account
+           page); Content-Type: application/json. Premium-tier plan required.
+Limits:    10 requests / 5 seconds per email or IP; query complexity limit
+           25000; maximum query depth 13. Connections paginate 25 per page by
+           default via cursor args (first, last, after, before).
+
+Field names and types below follow the published object reference. Objects that
+were not individually inspected are modeled from the documented operation and
+object lists and are marked as such; treat this file as an honest model of the
+live schema, not a verbatim introspection dump.
+"""
+
+# ─────────────────────────────────────────────
+# Scalars (as used by Printavo)
+# ─────────────────────────────────────────────
+
+scalar ISO8601DateTime
+scalar ISO8601Date
+
+# ─────────────────────────────────────────────
+# Interfaces
+# ─────────────────────────────────────────────
+
+interface IDed {
+  id: ID!
+}
+
+interface Timestamps {
+  timestamps: ObjectTimestamps!
+}
+
+type ObjectTimestamps {
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
+}
+
+# ─────────────────────────────────────────────
+# Enums
+# ─────────────────────────────────────────────
+
+enum StatusType {
+  QUOTE
+  INVOICE
+  MERCH
+  TASK
+}
+
+enum SortDirection {
+  ASCENDING
+  DESCENDING
+}
+
+# ─────────────────────────────────────────────
+# Order union (Quotes + Invoices)
+# ─────────────────────────────────────────────
+
+"An Order is the union of Quote and Invoice documents."
+union OrderUnion = Quote | Invoice
+
+"Object a Task can be attached to."
+union TaskableUnion = Quote | Invoice
+
+# ─────────────────────────────────────────────
+# Quote (grounded from object/quote)
+# ─────────────────────────────────────────────
+
+type Quote implements IDed & Timestamps {
+  id: ID!
+  visualId: ID
+  nickname: String
+  publicHash: String!
+  createdAt: ISO8601Date!
+  startAt: ISO8601DateTime!
+  dueAt: ISO8601DateTime!
+  customerDueAt: ISO8601Date!
+  paymentDueAt: ISO8601Date!
+  invoiceAt: ISO8601Date!
+  subtotal: Float
+  total: Float
+  totalUntaxed: Float
+  discount: Float
+  discountAmount: Float
+  discountAsPercentage: Boolean
+  salesTax: Float
+  salesTaxAmount: Float
+  amountPaid: Float
+  amountOutstanding: Float
+  paidInFull: Boolean!
+  totalQuantity: Int
+  contact: Contact!
+  owner: User
+  status: Status!
+  deliveryMethod: DeliveryMethod
+  paymentTerm: PaymentTerm
+  paymentRequest: PaymentRequest
+  billingAddress: CustomerAddress
+  shippingAddress: CustomerAddress
+  customerNote: String
+  productionNote: String
+  visualPoNumber: String
+  tags: [String!]
+  url: String!
+  publicUrl: String!
+  publicPdf: String!
+  packingSlipUrl: String!
+  workorderUrl: String!
+  merch: Boolean!
+  lineItemGroups(first: Int, last: Int, after: String, before: String): LineItemGroupConnection
+  tasks(first: Int, last: Int, after: String, before: String): TaskConnection
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# Invoice (modeled - a Quote converted to a billable order; shares Quote shape)
+# ─────────────────────────────────────────────
+
+type Invoice implements IDed & Timestamps {
+  id: ID!
+  visualId: ID
+  nickname: String
+  publicHash: String!
+  createdAt: ISO8601Date!
+  dueAt: ISO8601DateTime!
+  customerDueAt: ISO8601Date!
+  paymentDueAt: ISO8601Date!
+  subtotal: Float
+  total: Float
+  totalUntaxed: Float
+  amountPaid: Float
+  amountOutstanding: Float
+  paidInFull: Boolean!
+  totalQuantity: Int
+  contact: Contact!
+  owner: User
+  status: Status!
+  deliveryMethod: DeliveryMethod
+  paymentTerm: PaymentTerm
+  paymentRequest: PaymentRequest
+  billingAddress: CustomerAddress
+  shippingAddress: CustomerAddress
+  customerNote: String
+  productionNote: String
+  visualPoNumber: String
+  tags: [String!]
+  url: String!
+  publicUrl: String!
+  merch: Boolean!
+  lineItemGroups(first: Int, last: Int, after: String, before: String): LineItemGroupConnection
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# Customer & Contact (grounded from object/customer)
+# ─────────────────────────────────────────────
+
+type Customer implements IDed & Timestamps {
+  id: ID!
+  companyName: String
+  primaryContact: Contact
+  billingAddress: CustomerAddress
+  shippingAddress: CustomerAddress
+  owner: User
+  orderCount: Int
+  salesTax: Float
+  taxExempt: Boolean
+  defaultPaymentTerm: PaymentTerm
+  resaleNumber: String
+  internalNote: String
+  contacts(first: Int, last: Int, after: String, before: String): ContactConnection
+  orders(first: Int, last: Int, after: String, before: String): OrderConnection
+  reminders(first: Int, last: Int, after: String, before: String): TaskConnection
+  timestamps: ObjectTimestamps!
+}
+
+type Contact implements IDed & Timestamps {
+  id: ID!
+  fullName: String
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  customer: Customer
+  orderCount: Int
+  timestamps: ObjectTimestamps!
+}
+
+type CustomerAddress {
+  id: ID
+  companyName: String
+  customerName: String
+  address1: String
+  address2: String
+  city: String
+  state: String
+  zipCode: String
+  country: String
+}
+
+# ─────────────────────────────────────────────
+# Line Items (grounded from object/lineitem)
+# ─────────────────────────────────────────────
+
+type LineItem implements IDed & Timestamps {
+  id: ID!
+  itemNumber: String
+  position: Int
+  product: String
+  category: String
+  color: String
+  description: String
+  items: Int
+  price: Float
+  markupPercentage: Float
+  taxed: Boolean
+  merch: Boolean!
+  productStatus: Status
+  personalizations: [Personalization!]
+  sizes: [LineItemSize!]
+  lineItemGroup: LineItemGroup
+  priceReceipt: LineItemPriceReceipt
+  mockups(first: Int, last: Int, after: String, before: String): MockupConnection
+  timestamps: ObjectTimestamps!
+}
+
+type LineItemSize {
+  size: String!
+  quantity: Int!
+}
+
+type Personalization {
+  name: String
+  value: String
+}
+
+type LineItemPriceReceipt {
+  unitCost: Float
+  quantity: Int
+  total: Float
+}
+
+type LineItemGroup implements IDed & Timestamps {
+  id: ID!
+  position: Int
+  lineItems(first: Int, last: Int, after: String, before: String): LineItemConnection
+  imprints(first: Int, last: Int, after: String, before: String): ImprintConnection
+  timestamps: ObjectTimestamps!
+}
+
+type Imprint implements IDed & Timestamps {
+  id: ID!
+  typeOfWork: String
+  details: String
+  pricingMatrixColumn: String
+  timestamps: ObjectTimestamps!
+}
+
+type Mockup {
+  id: ID!
+  url: String
+  position: Int
+}
+
+type Fee implements IDed & Timestamps {
+  id: ID!
+  description: String
+  amount: Float
+  taxable: Boolean
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# Status (grounded from object/status)
+# ─────────────────────────────────────────────
+
+type Status implements IDed & Timestamps {
+  id: ID!
+  name: String!
+  color: String
+  type: StatusType!
+  position: Int
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# Task (grounded from object/task)
+# ─────────────────────────────────────────────
+
+type Task implements IDed & Timestamps {
+  id: ID!
+  name: String!
+  completed: Boolean!
+  completedAt: ISO8601DateTime
+  completedBy: User
+  dueAt: ISO8601DateTime!
+  assignedTo: User
+  taskable: TaskableUnion
+  sourcePresetTaskGroupTitle: String
+  timestamps: ObjectTimestamps!
+}
+
+type ApprovalRequest implements IDed & Timestamps {
+  id: ID!
+  approved: Boolean!
+  approvedAt: ISO8601DateTime
+  revokedAt: ISO8601DateTime
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# Payments (modeled from documented operations)
+# ─────────────────────────────────────────────
+
+type Transaction implements IDed & Timestamps {
+  id: ID!
+  amount: Float!
+  category: String
+  transactedFor: OrderUnion
+  timestamps: ObjectTimestamps!
+}
+
+type PaymentRequest implements IDed & Timestamps {
+  id: ID!
+  amount: Float
+  fulfilled: Boolean
+  timestamps: ObjectTimestamps!
+}
+
+type PaymentTerm {
+  id: ID!
+  name: String
+  days: Int
+}
+
+type DeliveryMethod {
+  id: ID!
+  name: String
+}
+
+# ─────────────────────────────────────────────
+# Merch (modeled from object/merchstore + merchOrder)
+# ─────────────────────────────────────────────
+
+type MerchStore implements IDed & Timestamps {
+  id: ID!
+  name: String
+  url: String
+  online: Boolean
+  opensAt: ISO8601DateTime
+  closesAt: ISO8601DateTime
+  timestamps: ObjectTimestamps!
+}
+
+type MerchOrder implements IDed & Timestamps {
+  id: ID!
+  visualId: ID
+  total: Float
+  merchStore: MerchStore
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# User
+# ─────────────────────────────────────────────
+
+type User implements IDed & Timestamps {
+  id: ID!
+  email: String
+  firstName: String
+  lastName: String
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# Connections (cursor-based; default 25 per page)
+# ─────────────────────────────────────────────
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type OrderConnection {
+  edges: [OrderEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type OrderEdge {
+  cursor: String!
+  node: OrderUnion!
+}
+
+type QuoteConnection {
+  edges: [QuoteEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type QuoteEdge {
+  cursor: String!
+  node: Quote!
+}
+
+type InvoiceConnection {
+  edges: [InvoiceEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type InvoiceEdge {
+  cursor: String!
+  node: Invoice!
+}
+
+type CustomerConnection {
+  edges: [CustomerEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type CustomerEdge {
+  cursor: String!
+  node: Customer!
+}
+
+type ContactConnection {
+  edges: [ContactEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type ContactEdge {
+  cursor: String!
+  node: Contact!
+}
+
+type LineItemConnection {
+  edges: [LineItemEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type LineItemEdge {
+  cursor: String!
+  node: LineItem!
+}
+
+type LineItemGroupConnection {
+  edges: [LineItemGroupEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type LineItemGroupEdge {
+  cursor: String!
+  node: LineItemGroup!
+}
+
+type ImprintConnection {
+  edges: [ImprintEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type ImprintEdge {
+  cursor: String!
+  node: Imprint!
+}
+
+type MockupConnection {
+  edges: [MockupEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type MockupEdge {
+  cursor: String!
+  node: Mockup!
+}
+
+type StatusConnection {
+  edges: [StatusEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type StatusEdge {
+  cursor: String!
+  node: Status!
+}
+
+type TaskConnection {
+  edges: [TaskEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type TaskEdge {
+  cursor: String!
+  node: Task!
+}
+
+type TransactionConnection {
+  edges: [TransactionEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type TransactionEdge {
+  cursor: String!
+  node: Transaction!
+}
+
+type MerchStoreConnection {
+  edges: [MerchStoreEdge!]!
+  pageInfo: PageInfo!
+  totalNodes: Int
+}
+type MerchStoreEdge {
+  cursor: String!
+  node: MerchStore!
+}
+
+# ─────────────────────────────────────────────
+# Input Types (modeled from documented mutations)
+# ─────────────────────────────────────────────
+
+input QuoteCreateInput {
+  customerId: ID!
+  contactId: ID
+  nickname: String
+  statusId: ID
+  customerNote: String
+  productionNote: String
+  tags: [String!]
+}
+
+input QuoteUpdateInput {
+  nickname: String
+  statusId: ID
+  customerDueAt: ISO8601Date
+  paymentDueAt: ISO8601Date
+  customerNote: String
+  productionNote: String
+  tags: [String!]
+}
+
+input InvoiceUpdateInput {
+  nickname: String
+  statusId: ID
+  paymentDueAt: ISO8601Date
+  customerNote: String
+  productionNote: String
+  tags: [String!]
+}
+
+input CustomerCreateInput {
+  companyName: String
+  ownerId: ID
+  taxExempt: Boolean
+  resaleNumber: String
+  internalNote: String
+}
+
+input CustomerUpdateInput {
+  companyName: String
+  ownerId: ID
+  taxExempt: Boolean
+  resaleNumber: String
+  internalNote: String
+}
+
+input ContactCreateInput {
+  customerId: ID!
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+}
+
+input ContactUpdateInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+}
+
+input LineItemInput {
+  lineItemGroupId: ID!
+  product: String
+  category: String
+  color: String
+  description: String
+  price: Float
+  markupPercentage: Float
+  sizes: [LineItemSizeInput!]
+}
+
+input LineItemSizeInput {
+  size: String!
+  quantity: Int!
+}
+
+input LineItemGroupInput {
+  parentId: ID!
+  position: Int
+}
+
+input ImprintInput {
+  lineItemGroupId: ID!
+  typeOfWork: String
+  details: String
+  pricingMatrixColumn: String
+}
+
+input FeeInput {
+  parentId: ID!
+  description: String
+  amount: Float
+  taxable: Boolean
+}
+
+input TaskInput {
+  name: String!
+  dueAt: ISO8601DateTime!
+  assignedToId: ID
+  taskableId: ID
+}
+
+input TaskUpdateInput {
+  name: String
+  dueAt: ISO8601DateTime
+  completed: Boolean
+  assignedToId: ID
+}
+
+input StatusUpdateInput {
+  parentId: ID!
+  statusId: ID!
+}
+
+input TransactionPaymentInput {
+  orderId: ID!
+  amount: Float!
+  category: String
+}
+
+# ─────────────────────────────────────────────
+# Query Root (grounded from operation/query)
+# ─────────────────────────────────────────────
+
+type Query {
+  "The authenticated account."
+  account: Account!
+
+  "The authenticated user."
+  user: User!
+
+  "Retrieve a single customer by id."
+  customer(id: ID!): Customer
+  "List customers."
+  customers(first: Int, last: Int, after: String, before: String): CustomerConnection!
+
+  "Retrieve a single contact by id."
+  contact(id: ID!): Contact
+  "List contacts."
+  contacts(first: Int, last: Int, after: String, before: String, sortOn: String, sortDescending: Boolean): ContactConnection!
+
+  "Retrieve a single order (Quote or Invoice) by id."
+  order(id: ID!): OrderUnion
+  "List orders - the union of quotes and invoices - filterable by production dates and statuses."
+  orders(first: Int, last: Int, after: String, before: String, statusIds: [ID!], sortOn: String, sortDescending: Boolean): OrderConnection!
+
+  "Retrieve a single quote by id."
+  quote(id: ID!): Quote
+  "List quotes."
+  quotes(first: Int, last: Int, after: String, before: String): QuoteConnection!
+
+  "Retrieve a single invoice by id."
+  invoice(id: ID!): Invoice
+  "List invoices."
+  invoices(first: Int, last: Int, after: String, before: String): InvoiceConnection!
+
+  "Retrieve a single line item by id."
+  lineItem(id: ID!): LineItem
+  "Retrieve a single line item group by id."
+  lineItemGroup(id: ID!): LineItemGroup
+
+  "Retrieve a single status by id."
+  status(id: ID!): Status
+  "List statuses."
+  statuses(first: Int, last: Int, after: String, before: String, type: StatusType): StatusConnection!
+
+  "Retrieve a single task by id."
+  task(id: ID!): Task
+  "List tasks."
+  tasks(first: Int, last: Int, after: String, before: String, sortOn: String, sortDescending: Boolean): TaskConnection!
+
+  "List payment requests."
+  paymentRequests(first: Int, last: Int, after: String, before: String): [PaymentRequest!]!
+
+  "Retrieve a single transaction by id."
+  transaction(id: ID!): Transaction
+  "List transactions."
+  transactions(first: Int, last: Int, after: String, before: String): TransactionConnection!
+
+  "Retrieve a single merch order by id."
+  merchOrder(id: ID!): MerchOrder
+  "Retrieve a single merch store by id."
+  merchStore(id: ID!): MerchStore
+  "List merch stores."
+  merchStores(first: Int, last: Int, after: String, before: String): MerchStoreConnection!
+}
+
+type Account implements IDed & Timestamps {
+  id: ID!
+  companyName: String
+  email: String
+  timestamps: ObjectTimestamps!
+}
+
+# ─────────────────────────────────────────────
+# Mutation Root (grounded from operation/mutation)
+# ─────────────────────────────────────────────
+
+type Mutation {
+  "Authenticate and return an API token."
+  login(email: String!, password: String!, deviceName: String, deviceToken: String): String
+  "Invalidate the current session token."
+  logout: Boolean
+
+  quoteCreate(input: QuoteCreateInput!): Quote
+  quoteUpdate(id: ID!, input: QuoteUpdateInput!): Quote
+  quoteDelete(id: ID!): Quote
+  quoteDuplicate(id: ID!): Quote
+
+  invoiceUpdate(id: ID!, input: InvoiceUpdateInput!): Invoice
+  invoiceDelete(id: ID!): Invoice
+  invoiceDuplicate(id: ID!): Invoice
+
+  customerCreate(input: CustomerCreateInput!): Customer
+  customerUpdate(id: ID!, input: CustomerUpdateInput!): Customer
+  customerDelete(id: ID!): Customer
+
+  contactCreate(input: ContactCreateInput!): Contact
+  contactUpdate(id: ID!, input: ContactUpdateInput!): Contact
+  contactDelete(id: ID!): Contact
+
+  lineItemCreate(input: LineItemInput!): LineItem
+  lineItemCreates(input: [LineItemInput!]!): [LineItem!]
+  lineItemUpdate(id: ID!, input: LineItemInput!): LineItem
+  lineItemUpdates(ids: [ID!]!, input: [LineItemInput!]!): [LineItem!]
+  lineItemDelete(id: ID!): LineItem
+  lineItemDeletes(ids: [ID!]!): [LineItem!]
+
+  lineItemGroupCreate(input: LineItemGroupInput!): LineItemGroup
+  lineItemGroupCreates(input: [LineItemGroupInput!]!): [LineItemGroup!]
+  lineItemGroupUpdate(id: ID!, input: LineItemGroupInput!): LineItemGroup
+  lineItemGroupUpdates(ids: [ID!]!, input: [LineItemGroupInput!]!): [LineItemGroup!]
+  lineItemGroupDelete(id: ID!): LineItemGroup
+  lineItemGroupDeletes(ids: [ID!]!): [LineItemGroup!]
+
+  imprintCreate(input: ImprintInput!): Imprint
+  imprintCreates(input: [ImprintInput!]!): [Imprint!]
+  imprintUpdate(id: ID!, input: ImprintInput!): Imprint
+  imprintUpdates(ids: [ID!]!, input: [ImprintInput!]!): [Imprint!]
+  imprintDelete(id: ID!): Imprint
+  imprintDeletes(ids: [ID!]!): [Imprint!]
+
+  feeCreate(input: FeeInput!): Fee
+  feeCreates(input: [FeeInput!]!): [Fee!]
+  feeUpdate(id: ID!, input: FeeInput!): Fee
+  feeUpdates(ids: [ID!]!, input: [FeeInput!]!): [Fee!]
+  feeDelete(id: ID!): Fee
+  feeDeletes(ids: [ID!]!): [Fee!]
+
+  statusUpdate(input: StatusUpdateInput!): Status
+
+  taskCreate(input: TaskInput!): Task
+  taskUpdate(id: ID!, input: TaskUpdateInput!): Task
+  taskDelete(id: ID!): Task
+
+  approvalRequestCreate(parentId: ID!): ApprovalRequest
+  approvalRequestApprove(id: ID!): ApprovalRequest
+  approvalRequestUnapprove(id: ID!): ApprovalRequest
+  approvalRequestRevoke(id: ID!): ApprovalRequest
+
+  transactionPaymentCreate(input: TransactionPaymentInput!): Transaction
+  transactionPaymentUpdate(id: ID!, input: TransactionPaymentInput!): Transaction
+  transactionPaymentDelete(id: ID!): Transaction
+}

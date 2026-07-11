@@ -1,0 +1,63 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Printavo
+providerId: printavo
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: false
+tags:
+- Print Shop Management
+- GraphQL
+- Rate Limiting
+- Quotas
+- Query Complexity
+description: >-
+  Printavo API v2 (GraphQL) enforces three documented limits - a request-rate
+  limit, a GraphQL query-complexity limit, and a maximum query depth. Requests
+  are rate-limited to 10 requests every 5 seconds, scoped per user email OR per
+  IP address. Each GraphQL operation must stay under a complexity score of 25000
+  and a nesting depth of 13. Connections default to 25 nodes per page and page
+  with cursor arguments.
+notes: >-
+  These limits are published in the Printavo API v2 documentation. API access
+  itself is gated to the Premium subscription tier. Values are grounded from the
+  public docs as of the review date; verify on the live docs during
+  reconciliation.
+sources:
+- https://www.printavo.com/docs/api/v2
+- https://www.printavo.com/docs/api/v2/operation/query/
+- https://www.printavo.com/blog/new-graphql-api/
+responseCodes:
+  throttled: 429
+limits:
+- name: Request Rate
+  scope: user-or-ip
+  metric: requests
+  limit: 10 per 5 seconds
+  notes: Scoped per user email or per IP address. Exceeding it returns HTTP 429.
+- name: Query Complexity
+  scope: operation
+  metric: complexity
+  limit: 25000
+  notes: Each GraphQL operation is scored; requests over the complexity limit are rejected.
+- name: Query Depth
+  scope: operation
+  metric: depth
+  limit: 13
+  notes: Maximum nesting depth permitted in a single GraphQL query.
+- name: Connection Page Size
+  scope: connection
+  metric: nodes
+  limit: 25 default
+  notes: Connections return 25 nodes per page by default; page with first/last/after/before cursor args.
+policies:
+- name: Backoff Strategy
+  description: Clients should throttle to stay within 10 requests per 5 seconds and implement exponential backoff with jitter on HTTP 429 responses.
+- name: Query Budgeting
+  description: Trim field selections and connection page sizes to stay under the 25000 complexity score and depth of 13; GraphQL lets you request only the fields you need.
+- name: Cursor Pagination
+  description: Use cursor-based pagination (first/last/after/before) rather than deep single queries to spread load across requests.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
