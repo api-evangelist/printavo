@@ -1,0 +1,22 @@
+generated: '2026-07-11'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.printavo.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep  9 22:06:47 2026 GMT
+  hsts: false
+domains:
+- domain: printavo.com
+  dnssec: false
+  caa:
+  - 0 issuewild "sectigo.com"
+  - 0 issue "pki.goog"
+  - 0 issue "globalsign.com"
+  - 0 issuewild "globalsign.com"
+  - 0 issue "sectigo.com"
+  - 0 issue "letsencrypt.org"
+  spf: true
+  dmarc: true
+  dmarc_policy: quarantine
