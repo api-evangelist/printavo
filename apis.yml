@@ -30,6 +30,15 @@ tags:
 - Embroidery
 - Quotes
 - Invoices
+- Order
+- GraphQL
+- Decorated Apparel
+tags_raw:
+- Print Shop Management
+- Screen Printing
+- Embroidery
+- Quotes
+- Invoices
 - Orders
 - GraphQL
 - Decorated Apparel
@@ -65,6 +74,10 @@ apis:
   name: Printavo Invoices API
   tags:
   - Invoices
+  - Order
+  - GraphQL
+  tags_raw:
+  - Invoices
   - Orders
   - GraphQL
   image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
@@ -87,6 +100,10 @@ apis:
 - aid: printavo:printavo-orders-api
   name: Printavo Orders API
   tags:
+  - Order
+  - Production
+  - GraphQL
+  tags_raw:
   - Orders
   - Production
   - GraphQL
@@ -159,6 +176,11 @@ apis:
 - aid: printavo:printavo-statuses-api
   name: Printavo Statuses API
   tags:
+  - Status
+  - Workflows
+  - Production
+  - GraphQL
+  tags_raw:
   - Statuses
   - Workflow
   - Production
@@ -183,6 +205,10 @@ apis:
 - aid: printavo:printavo-tasks-api
   name: Printavo Tasks API
   tags:
+  - Task
+  - Approvals
+  - GraphQL
+  tags_raw:
   - Tasks
   - Approvals
   - GraphQL
@@ -207,6 +233,11 @@ apis:
   name: Printavo Payments API
   tags:
   - Payments
+  - Transaction
+  - Fees
+  - GraphQL
+  tags_raw:
+  - Payments
   - Transactions
   - Fees
   - GraphQL
@@ -230,6 +261,11 @@ apis:
 - aid: printavo:printavo-merch-api
   name: Printavo Merch API
   tags:
+  - Merch
+  - Online Stores
+  - E-Commerce
+  - GraphQL
+  tags_raw:
   - Merch
   - Online Stores
   - Ecommerce
