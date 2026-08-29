@@ -11,6 +11,17 @@ description: >-
   account email plus an API token and is gated to Printavo's Premium
   subscription tier; the API reference and GraphQL schema are publicly
   documented at www.printavo.com/docs/api/v2.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: approval
