@@ -273,7 +273,7 @@ apis:
   name: Printavo Merch API
   tags:
   - Merch
-  - Online Stores
+  - Online Store
   - E-Commerce
   - GraphQL
   tags_raw:
