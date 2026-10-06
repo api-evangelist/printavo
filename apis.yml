@@ -54,7 +54,7 @@ tags_raw:
 - GraphQL
 - Decorated Apparel
 created: '2026-07-11'
-modified: '2026-07-11'
+modified: '2026-10-06'
 specificationVersion: '0.23'
 apis:
 - aid: printavo:printavo-quotes-api
@@ -298,6 +298,8 @@ apis:
     merch stores (a separately priced add-on) to pull group-store sales into the
     same order and production workflow as the rest of the shop.
 common:
+- url: https://www.printavo.com/blog/feed/
+  type: BlogRSS
 - type: DomainSecurity
   url: security/printavo-domain-security.yml
 - type: LinkedIn
